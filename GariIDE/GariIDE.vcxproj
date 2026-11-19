@@ -130,15 +130,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ast.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GariIDE.h" />
+    <ClInclude Include="lexer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="typechecker.h" />
+    <ClInclude Include="value.h" />
+    <ClInclude Include="vm.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ast.cpp" />
     <ClCompile Include="core.cpp" />
+    <ClCompile Include="lexer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="typechecker.cpp" />
+    <ClCompile Include="value.cpp" />
+    <ClCompile Include="vm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GariIDE.rc" />

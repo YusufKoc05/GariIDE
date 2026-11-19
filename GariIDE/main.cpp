@@ -1,4 +1,4 @@
-﻿// main.cpp — GariIDE UI (VS-like) — menu + toolbar + zoom + wrap + find + file open/save + splitter + accelerators + RichEdit + gutter line numbers + owner-draw tabs + status bar
+﻿// main.cpp — GariIDE UI (Dark Carbon & Crimson Pro Edition) — menu + toolbar + zoom + wrap + find + file open/save + splitter + accelerators + RichEdit + gutter line numbers + owner-draw tabs + status bar
 // PATCH: Ctrl+Shift+P Komut Menüsü + RUN sonrası ilk hata için squiggle (WM_APP_SETERRMARK)
 
 #ifndef UNICODE
@@ -62,36 +62,36 @@
 #define MSFTEDIT_CLASS L"RICHEDIT50W"
 #endif
 
-// ===================== Design Tokens =====================
-static COLORREF TOK_BG = RGB(15, 18, 26);
-static COLORREF TOK_SURFACE = RGB(21, 26, 36);
-static COLORREF TOK_SURFACE2 = RGB(27, 34, 48);
-static COLORREF TOK_ACCENT = RGB(76, 141, 255);
-static COLORREF TOK_GOOD = RGB(35, 200, 105);   // RUN yeşil
-static COLORREF TOK_TEXT = RGB(230, 234, 242);
-static COLORREF TOK_MUTED = RGB(154, 164, 178);
-static COLORREF TOK_BORDER = RGB(60, 70, 92);
-static COLORREF TOK_GUTTERBG = RGB(14, 16, 22);
-static COLORREF TOK_GUTTERHI = RGB(45, 55, 80);
+// ===================== Design Tokens (DARK CARBON & CRIMSON PRO) =====================
+static COLORREF TOK_BG = RGB(150, 40, 50);            // Ana İç Paneller: Tok ve asil bir koyu kiremit / Crimson kırmızısı
+static COLORREF TOK_SURFACE = RGB(45, 48, 50);        // Üst Paneller / Toolbar: Derin mat antrasit / karbon grisi
+static COLORREF TOK_SURFACE2 = RGB(65, 70, 72);       // Hover/Seçim Durumu: Belirgin açık karbon grisi
+static COLORREF TOK_ACCENT = RGB(220, 50, 65);        // Odak/Vurgu Çizgileri: Parlak kor kırmızısı
+static COLORREF TOK_GOOD = RGB(140, 220, 140);        // Çalıştır Sembolü: Gri-Kırmızı kontrastında parlayan soft yeşil
+static COLORREF TOK_TEXT = RGB(235, 240, 242);        // Gri alanlardaki metinler: Temiz açık gümüş gri / beyaz
+static COLORREF TOK_MUTED = RGB(130, 135, 138);       // İkincil / Sönük Metinler (Mat Karbon Gri)
+static COLORREF TOK_BORDER = RGB(35, 38, 40);         // Panel Sınırları: Keskin ve elit koyu antrasit çizgiler
+static COLORREF TOK_GUTTERBG = RGB(130, 32, 42);       // Satır Sayısı Alanı: Editörden bir ton daha koyu, asil mat kırmızı
+static COLORREF TOK_GUTTERHI = RGB(175, 50, 62);       // Aktif Satır Vurgulama Alanı
 
-// Editor: beyaz zemin + siyah yazı
-static COLORREF TOK_CODE_TEXT = RGB(0, 0, 0);
-static COLORREF TOK_EDITOR_BG = RGB(255, 255, 255);
+// İç Editör Alanı Metin ve Arka Plan Senkronizasyonu (Profesyonel Yüksek Okunurluk)
+static COLORREF TOK_CODE_TEXT = RGB(255, 252, 250);   // Kod Metni: Koyu Crimson üzerinde parlayan temiz krem beyazı
+static COLORREF TOK_EDITOR_BG = RGB(150, 40, 50);      // Editör İç Arka Planı: Tok mat Crimson kırmızısı
 
-// Find window: modern dark
-static COLORREF TOK_FIND_BG = RGB(12, 14, 20);
-static COLORREF TOK_FIND_SURF = RGB(16, 19, 28);
-static COLORREF TOK_FIND_EDIT = RGB(18, 21, 30);
-static COLORREF TOK_FIND_BORDER = RGB(70, 78, 98);
-static COLORREF TOK_FIND_TITLETX = RGB(230, 234, 242);
-static COLORREF TOK_FIND_BT = RGB(0, 0, 0);
-static COLORREF TOK_FIND_BT_H = RGB(18, 18, 18);
-static COLORREF TOK_FIND_BT_D = RGB(10, 10, 10);
+// Find window: Industrial Slate Styles Popup
+static COLORREF TOK_FIND_BG = RGB(150, 40, 50);
+static COLORREF TOK_FIND_SURF = RGB(45, 48, 50);
+static COLORREF TOK_FIND_EDIT = RGB(35, 38, 40);
+static COLORREF TOK_FIND_BORDER = RGB(220, 50, 65);
+static COLORREF TOK_FIND_TITLETX = RGB(235, 240, 242);
+static COLORREF TOK_FIND_BT = RGB(65, 70, 72);
+static COLORREF TOK_FIND_BT_H = RGB(85, 90, 92);
+static COLORREF TOK_FIND_BT_D = RGB(220, 50, 65);
 
 static HBRUSH gBrBg = nullptr, gBrSurface = nullptr, gBrSurface2 = nullptr;
 static HBRUSH gBrTab = nullptr;
-static HBRUSH gBrEdit = nullptr;        // dark panels
-static HBRUSH gBrEditorWhite = nullptr; // editor white
+static HBRUSH gBrEdit = nullptr;
+static HBRUSH gBrEditorWhite = nullptr;
 static HBRUSH gBrFindBg = nullptr;
 static HBRUSH gBrFindSurf = nullptr;
 static HBRUSH gBrFindEdit = nullptr;
@@ -154,9 +154,15 @@ enum {
     IDM_TOOLS_SETTINGS,
 
     IDM_HELP_ABOUT,
+    IDM_HELP_LANGREF,
 
     IDM_RUN_F5,
     IDM_RUN_INTERP,
+
+    IDM_EXAMPLE_1,
+    IDM_EXAMPLE_2,
+    IDM_EXAMPLE_3,
+    IDM_EXAMPLE_4,
 };
 
 #define WM_APP_APPENDOUT    (WM_APP + 10)
@@ -177,7 +183,7 @@ static int gBottomH = 230;
 static const int gMinBottomH = 140;
 static const int gMaxBottomH = 360;
 
-static const int gSplitterW = 6;
+static const int gSplitterW = 4;
 static const int gGutterW = 54;
 
 static HWND g_hCode = nullptr;
@@ -241,7 +247,7 @@ static std::wstring gPendingAppend;
 
 static std::thread gRunThread;
 static bool gRunActive = false;
-static bool gRunUseVM = true; // true: bytecode VM, false: AST interpreter
+static bool gRunUseVM = true;
 
 // --------------------- Helpers ---------------------
 static int ClampI(int v, int a, int b) { return v < a ? a : (v > b ? b : v); }
@@ -337,15 +343,121 @@ static void ApplyWrapState() {
     if (g_hGutter) InvalidateRect(g_hGutter, nullptr, TRUE);
 }
 
-// ===================== Demo =====================
+// ===================== Demo & Örnekler =====================
 static std::wstring DemoCode() {
     return
+        L"// === GariIDE: Ege Agzi Programlama Dili ===\r\n"
+        L"sabit laf BOLGE = \"Ege Bolgesi\";\r\n\r\n"
+        L"kalip_gari Zeybek {\r\n"
+        L"    laf isim;\r\n"
+        L"    tamsayi yas;\r\n"
+        L"}\r\n\r\n"
+        L"// Varsayilan parametreli fonksiyon (unvan verilmezse \"Efe\" alinir)\r\n"
+        L"fonksiyon_gari bos_gari selamla_gari(laf kim, laf unvan = \"Efe\") {\r\n"
+        L"    doktur(\"[\" + BOLGE + \"] Selam olsun sana, \" + buyut_gari(kim) + \" \" + unvan + \"!\");\r\n"
+        L"}\r\n\r\n"
+        L"fonksiyon_gari tamsayi faktoriyel(tamsayi n) {\r\n"
+        L"    dondur_gari (n <= 1) ? 1 : (n * faktoriyel(n - 1));\r\n"
+        L"}\r\n\r\n"
         L"basla_gari() {\r\n"
-        L"  doktur(\"Sayi giriniz:\");\r\n"
-        L"  tamsayi x = oku_tamsayi();\r\n"
-        L"  sayet (x % 2 == 0) { doktur(\"cift\"); }\r\n"
-        L"  yoksa { doktur(\"tek\"); }\r\n"
-        L"  dondur_gari 0;\r\n"
+        L"    Zeybek efe;\r\n"
+        L"    efe.isim = \"Yoruk Ali\";\r\n"
+        L"    efe.yas = 28;\r\n"
+        L"    selamla_gari(efe.isim);\r\n\r\n"
+        L"    // Üçlü koşul operatörü (? :)\r\n"
+        L"    laf durum = (efe.yas >= 18) ? \"Yetiskin Zeybek\" : \"Genc Kizan\";\r\n"
+        L"    doktur(\"Durum: \" + durum);\r\n\r\n"
+        L"    // Sozluk_gari (Map / Harita) kullanimi\r\n"
+        L"    sozluk_gari tamsayi plakalar = [\"Aydin\": 9, \"Izmir\": 35, \"Mugla\": 48];\r\n"
+        L"    plakalar[\"Denizli\"] = 20;\r\n"
+        L"    doktur(\"Ege Plakalari: \" + lafa_cevir(plakalar));\r\n\r\n"
+        L"    dizi_gari tamsayi sayilar = [30, 10, 40, 20];\r\n"
+        L"    ekle_gari(sayilar, 50);\r\n"
+        L"    sirala_gari(sayilar);\r\n\r\n"
+        L"    tamsayi toplam = 0;\r\n"
+        L"    gez_gari (tamsayi s : sayilar) {\r\n"
+        L"        toplam += s;\r\n"
+        L"    }\r\n"
+        L"    doktur(\"Sirali Dizi Toplami: \" + lafa_cevir(toplam) + \" | 5! = \" + lafa_cevir(faktoriyel(5)));\r\n\r\n"
+        L"    dene_gari {\r\n"
+        L"        sayet (icinde_var_mi(plakalar, \"Aydin\") hem_de hakli) {\r\n"
+        L"            firlat_gari(\"Aydin plakasi 0\" + lafa_cevir(plakalar[\"Aydin\"]) + \" bulundu gari!\");\r\n"
+        L"        }\r\n"
+        L"    } yakala_gari (laf bilgi) {\r\n"
+        L"        doktur(\"Yakalanan: \" + bilgi);\r\n"
+        L"    }\r\n\r\n"
+        L"    dondur_gari 0;\r\n"
+        L"}\r\n";
+}
+
+static std::wstring ExampleCode_Algorithms() {
+    return
+        L"// === Ornek 2: Ozyineleme (Fibonacci) ve Dizi siralama ===\r\n"
+        L"fonksiyon_gari tamsayi fib(tamsayi n) {\r\n"
+        L"    sayet (n <= 1) { dondur_gari n; }\r\n"
+        L"    dondur_gari fib(n - 1) + fib(n - 2);\r\n"
+        L"}\r\n\r\n"
+        L"basla_gari() {\r\n"
+        L"    dizi_gari tamsayi fibler = [];\r\n"
+        L"    cevir_gari (tamsayi i = 0; i < 8; i++) {\r\n"
+        L"        ekle_gari(fibler, fib(i));\r\n"
+        L"    }\r\n"
+        L"    doktur(\"Ilk 8 Fibonacci sayisi: \" + lafa_cevir(fibler));\r\n"
+        L"    ters_cevir_gari(fibler);\r\n"
+        L"    doktur(\"Ters cevrilmis hali: \" + lafa_cevir(fibler));\r\n"
+        L"    dondur_gari 0;\r\n"
+        L"}\r\n";
+}
+
+static std::wstring ExampleCode_StructsAndSwitch() {
+    return
+        L"// === Ornek 3: Kalip_gari (Struct), Gez_gari ve Bak_hele (Switch) ===\r\n"
+        L"kalip_gari Zeytinlik {\r\n"
+        L"    laf ilce;\r\n"
+        L"    tamsayi agac_sayisi;\r\n"
+        L"}\r\n\r\n"
+        L"basla_gari() {\r\n"
+        L"    Zeytinlik bahce;\r\n"
+        L"    bahce.ilce = \"Nazilli\";\r\n"
+        L"    bahce.agac_sayisi = 150;\r\n"
+        L"    bahce.agac_sayisi += 50;\r\n\r\n"
+        L"    doktur(\"Zeytinlik: \" + lafa_cevir(bahce));\r\n\r\n"
+        L"    bak_hele (bahce.ilce) {\r\n"
+        L"        olursa \"Milas\":\r\n"
+        L"            doktur(\"Mugla zeytini gari!\");\r\n"
+        L"            kir_gari;\r\n"
+        L"        olursa \"Nazilli\":\r\n"
+        L"            doktur(\"Aydin inciri ve zeytini bereketli olur gari!\");\r\n"
+        L"            kir_gari;\r\n"
+        L"        hicbiri:\r\n"
+        L"            doktur(\"Baska bir Ege kasabasi.\");\r\n"
+        L"    }\r\n\r\n"
+        L"    dizi_gari laf kasabalar = [\"Tire\", \"Odemis\", \"Bodrum\", \"Fethiye\"];\r\n"
+        L"    sirala_gari(kasabalar);\r\n"
+        L"    gez_gari (laf k : kasabalar) {\r\n"
+        L"        doktur(\"-> Gezilen Kasaba: \" + k);\r\n"
+        L"    }\r\n"
+        L"    dondur_gari 0;\r\n"
+        L"}\r\n";
+}
+
+static std::wstring ExampleCode_TryCatchAndFiles() {
+    return
+        L"// === Ornek 4: Dene_gari / Yakala_gari (Hata Yakalama) ve Metin Islemleri ===\r\n"
+        L"basla_gari() {\r\n"
+        L"    laf cumle = \"   Ege denizi cok guzel gari!   \";\r\n"
+        L"    cumle = kirp_gari(cumle);\r\n"
+        L"    cumle = degistir_gari(cumle, \"guzel\", \"sahane\");\r\n"
+        L"    doktur(\"Duzenlenen Laf: \" + cumle);\r\n\r\n"
+        L"    dene_gari {\r\n"
+        L"        doktur(\"Sifira bolme denemesi yapiliyor...\");\r\n"
+        L"        tamsayi a = 42 / 0;\r\n"
+        L"        doktur(a);\r\n"
+        L"    } yakala_gari (laf hata) {\r\n"
+        L"        doktur(\"Hata yakalandi, program cokmedi: \" + hata);\r\n"
+        L"    }\r\n\r\n"
+        L"    doktur(\"Rastgele sansli sayin: \" + lafa_cevir(rastgele_gari(1, 100)));\r\n"
+        L"    dondur_gari 0;\r\n"
         L"}\r\n";
 }
 
@@ -512,7 +624,7 @@ static void GutterPaint(HWND h) {
             HBRUSH brHi = CreateSolidBrush(TOK_GUTTERHI);
             FillRect(dc, &rLine, brHi);
             DeleteObject(brHi);
-            SetTextColor(dc, TOK_TEXT);
+            SetTextColor(dc, TOK_CODE_TEXT);
         }
         else {
             SetTextColor(dc, TOK_MUTED);
@@ -527,7 +639,7 @@ static void GutterPaint(HWND h) {
         y += lineH;
     }
 
-    HPEN pen = CreatePen(PS_SOLID, 1, Mix(TOK_BORDER, -10));
+    HPEN pen = CreatePen(PS_SOLID, 1, TOK_BORDER);
     HGDIOBJ oldP = SelectObject(dc, pen);
     MoveToEx(dc, rc.right - 1, rc.top, nullptr);
     LineTo(dc, rc.right - 1, rc.bottom);
@@ -606,10 +718,9 @@ static void Find_ApplyRounded(HWND h) {
 }
 
 static void Find_EnableDwmRounding(HWND) {
-    // opsiyonel / kapalı
 }
 
-// Owner-draw black buttons for Find (Next/Close)
+// Owner-draw buttons for Find (Next/Close)
 static LRESULT DrawFindButton(DRAWITEMSTRUCT* dis) {
     HDC dc = dis->hDC;
     RECT r = dis->rcItem;
@@ -619,7 +730,7 @@ static LRESULT DrawFindButton(DRAWITEMSTRUCT* dis) {
     bool disb = (dis->itemState & ODS_DISABLED) != 0;
 
     COLORREF bg = TOK_FIND_BT;
-    if (disb) bg = RGB(40, 40, 40);
+    if (disb) bg = RGB(80, 40, 45);
     else if (down) bg = TOK_FIND_BT_D;
     else if (hot)  bg = TOK_FIND_BT_H;
 
@@ -627,10 +738,10 @@ static LRESULT DrawFindButton(DRAWITEMSTRUCT* dis) {
     FillRect(dc, &r, br);
     DeleteObject(br);
 
-    HPEN pen = CreatePen(PS_SOLID, 1, Mix(TOK_FIND_BORDER, -10));
+    HPEN pen = CreatePen(PS_SOLID, 1, TOK_FIND_BORDER);
     HGDIOBJ oldP = SelectObject(dc, pen);
     HGDIOBJ oldB = SelectObject(dc, GetStockObject(HOLLOW_BRUSH));
-    RoundRect(dc, r.left, r.top, r.right, r.bottom, 10, 10);
+    RoundRect(dc, r.left, r.top, r.right, r.bottom, 6, 6);
     SelectObject(dc, oldB);
     SelectObject(dc, oldP);
     DeleteObject(pen);
@@ -639,7 +750,7 @@ static LRESULT DrawFindButton(DRAWITEMSTRUCT* dis) {
     GetWindowTextW(dis->hwndItem, text, 63);
 
     SetBkMode(dc, TRANSPARENT);
-    SetTextColor(dc, RGB(240, 240, 240));
+    SetTextColor(dc, TOK_TEXT);
     HFONT oldF = (HFONT)SelectObject(dc, gFontUI);
     DrawTextW(dc, text, -1, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
     SelectObject(dc, oldF);
@@ -777,12 +888,12 @@ static LRESULT CALLBACK FindWndProc(HWND h, UINT m, WPARAM w, LPARAM l) {
 
         if (hc == g_hFindEdit) {
             SetBkColor(dc, TOK_FIND_EDIT);
-            SetTextColor(dc, RGB(240, 240, 240));
+            SetTextColor(dc, TOK_CODE_TEXT);
             return (INT_PTR)gBrFindEdit;
         }
 
         SetBkColor(dc, TOK_FIND_BG);
-        SetTextColor(dc, RGB(240, 240, 240));
+        SetTextColor(dc, TOK_CODE_TEXT);
         return (INT_PTR)gBrFindBg;
     }
 
@@ -853,13 +964,11 @@ static void ShowFindWindow(HWND owner) {
 }
 
 // ===================== Errors: parse + underline =====================
-// (B) WM_APP_SETERRMARK payload
 struct ErrMark {
     int line = 0;
     int col = 0;
 };
 
-// Thread çıktısından ilk hata satır/sütununu çekmek için küçük parser
 struct Problem {
     int line = 0;
     int col = 0;
@@ -867,7 +976,6 @@ struct Problem {
 
 static std::vector<Problem> ParseProblemsFromText(const std::wstring& text) {
     std::vector<Problem> out;
-    // TypeError / ParseError / RuntimeError / LexError ... line/Ln ... col/Col
     std::wregex r1(
         LR"((TypeError|ParseError|RuntimeError|LexError)[^\n]*?(?:line|Ln)\s*[:=]?\s*(\d+)[^\n]*?(?:col|Col)\s*[:=]?\s*(\d+))",
         std::regex_constants::icase
@@ -911,19 +1019,143 @@ static int Editor_GuessTokenLenAt(int pos) {
     return (len <= 0) ? 1 : len;
 }
 
+static bool gInSyntaxHighlight = false;
+
+static void Editor_HighlightSyntax() {
+    if (!g_hCode || gInSyntaxHighlight) return;
+    gInSyntaxHighlight = true;
+
+    DWORD selStart = 0, selEnd = 0;
+    SendMessageW(g_hCode, EM_GETSEL, (WPARAM)&selStart, (LPARAM)&selEnd);
+    POINT scrollPt{};
+    SendMessageW(g_hCode, EM_GETSCROLLPOS, 0, (LPARAM)&scrollPt);
+
+    LRESULT oldMask = SendMessageW(g_hCode, EM_SETEVENTMASK, 0, 0);
+    SendMessageW(g_hCode, WM_SETREDRAW, FALSE, 0);
+
+    // RichEdit50W içinde \r\n tek karakter (\r) olarak indekslenir. EM_GETTEXTEX veya \r\n -> \r dönüşümü ile tam indeks eşleşmesi sağlıyoruz:
+    std::wstring raw = GetTextW(g_hCode);
+    std::wstring text;
+    text.reserve(raw.size());
+    for (size_t k = 0; k < raw.size(); ++k) {
+        if (raw[k] == L'\r' && k + 1 < raw.size() && raw[k + 1] == L'\n') {
+            text.push_back(L'\n');
+            k++;
+        } else {
+            text.push_back(raw[k]);
+        }
+    }
+
+    auto setFormat = [&](int start, int end, COLORREF clr, DWORD effects = 0) {
+        if (end <= start) return;
+        SendMessageW(g_hCode, EM_SETSEL, start, end);
+        CHARFORMAT2W cf{};
+        cf.cbSize = sizeof(cf);
+        cf.dwMask = CFM_COLOR | CFM_UNDERLINE | CFM_BOLD | CFM_ITALIC;
+        cf.dwEffects = effects;
+        cf.crTextColor = clr;
+        SendMessageW(g_hCode, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM)&cf);
+    };
+
+    // 1. Tüm metni varsayılan krem beyaza sıfırla
+    setFormat(0, (int)text.size(), TOK_CODE_TEXT, 0);
+
+    // Renk paleti (Koyu Crimson arka plan üzerinde yüksek kontrastlı)
+    const COLORREF CLR_KEYWORD = RGB(255, 210, 85);  // Parlak Altın Sarısı (Ege ağzı kontrol kelimeleri)
+    const COLORREF CLR_TYPE    = RGB(110, 235, 255); // Parlak Turkuaz (Veri tipleri)
+    const COLORREF CLR_BUILTIN = RGB(255, 175, 220); // Açık Pembe/Eflatun (Yerleşik fonksiyonlar)
+    const COLORREF CLR_STRING  = RGB(165, 245, 155); // Yumuşak Açık Yeşil (Laf / String literalleri)
+    const COLORREF CLR_NUMBER  = RGB(195, 180, 255); // Açık Lavanta (Sayılar ve hakli/haksiz)
+    const COLORREF CLR_COMMENT = RGB(185, 145, 150); // Sönük Gül/Gri (Yorum satırları)
+
+    size_t i = 0, n = text.size();
+    while (i < n) {
+        wchar_t c = text[i];
+
+        // Tek satırlı yorum: //
+        if (c == L'/' && i + 1 < n && text[i + 1] == L'/') {
+            size_t start = i;
+            while (i < n && text[i] != L'\n') i++;
+            setFormat((int)start, (int)i, CLR_COMMENT, CFE_ITALIC);
+            continue;
+        }
+        // Çok satırlı yorum: /* ... */
+        if (c == L'/' && i + 1 < n && text[i + 1] == L'*') {
+            size_t start = i;
+            i += 2;
+            while (i < n && !(text[i] == L'*' && i + 1 < n && text[i + 1] == L'/')) i++;
+            if (i < n) i += 2;
+            setFormat((int)start, (int)i, CLR_COMMENT, CFE_ITALIC);
+            continue;
+        }
+        // String literal: "..."
+        if (c == L'"') {
+            size_t start = i++;
+            while (i < n && text[i] != L'"') {
+                if (text[i] == L'\\' && i + 1 < n) i += 2;
+                else i++;
+            }
+            if (i < n) i++;
+            setFormat((int)start, (int)i, CLR_STRING, 0);
+            continue;
+        }
+        // Sayılar
+        if (std::iswdigit(c)) {
+            size_t start = i;
+            while (i < n && (std::iswdigit(text[i]) || text[i] == L'.')) i++;
+            setFormat((int)start, (int)i, CLR_NUMBER, 0);
+            continue;
+        }
+        // Tanımlayıcılar ve Anahtar Kelimeler
+        if (std::iswalpha(c) || c == L'_') {
+            size_t start = i;
+            while (i < n && (std::iswalnum(text[i]) || text[i] == L'_')) i++;
+            std::wstring word = text.substr(start, i - start);
+
+            if (word == L"basla_gari" || word == L"fonksiyon_gari" || word == L"kalip_gari" ||
+                word == L"sayet" || word == L"yoksa" || word == L"oldukca" || word == L"bi_yap_hele" ||
+                word == L"cevir_gari" || word == L"gez_gari" || word == L"dondur_gari" ||
+                word == L"kir_gari" || word == L"pas_gec" || word == L"bak_hele" || word == L"olursa" ||
+                word == L"hicbiri" || word == L"dene_gari" || word == L"yakala_gari" || word == L"firlat_gari" ||
+                word == L"doktur" || word == L"hem_de" || word == L"ya_da" || word == L"degil_gari") {
+                setFormat((int)start, (int)i, CLR_KEYWORD, CFE_BOLD);
+            }
+            else if (word == L"tamsayi" || word == L"hassas_sayi" || word == L"cift_hassas_sayi" ||
+                     word == L"laf" || word == L"mantik" || word == L"dizi_gari" || word == L"sozluk_gari" ||
+                     word == L"bos_gari" || word == L"sabit") {
+                setFormat((int)start, (int)i, CLR_TYPE, CFE_BOLD);
+            }
+            else if (word == L"hakli" || word == L"haksiz") {
+                setFormat((int)start, (int)i, CLR_NUMBER, CFE_BOLD);
+            }
+            else if (word == L"oku_gari" || word == L"oku_tamsayi" || word == L"oku_hassas_sayi" ||
+                     word == L"boyut_gari" || word == L"ekle_gari" || word == L"cikar_gari" ||
+                     word == L"sirala_gari" || word == L"ters_cevir_gari" || word == L"rastgele_gari" ||
+                     word == L"lafa_cevir" || word == L"tamsayiya_cevir" || word == L"hassasa_cevir" ||
+                     word == L"buyut_gari" || word == L"kucult_gari" || word == L"parcala_gari" ||
+                     word == L"icinde_var_mi" || word == L"degistir_gari" || word == L"kirp_gari" ||
+                     word == L"dosya_yaz_gari" || word == L"dosya_oku_gari" || word == L"dosya_var_mi" ||
+                     word == L"bekle_gari" || word == L"vakit_gari" || word == L"anahtarlar_gari" ||
+                     word == L"sil_gari" || word == L"kok" || word == L"us" ||
+                     word == L"mutlak" || word == L"min_gari" || word == L"max_gari") {
+                setFormat((int)start, (int)i, CLR_BUILTIN, 0);
+            }
+            continue;
+        }
+        i++;
+    }
+
+    SendMessageW(g_hCode, EM_SETSEL, selStart, selEnd);
+    SendMessageW(g_hCode, EM_SETSCROLLPOS, 0, (LPARAM)&scrollPt);
+    SendMessageW(g_hCode, WM_SETREDRAW, TRUE, 0);
+    InvalidateRect(g_hCode, nullptr, FALSE);
+    SendMessageW(g_hCode, EM_SETEVENTMASK, 0, oldMask);
+
+    gInSyntaxHighlight = false;
+}
+
 static void Editor_ClearAllMarks() {
-    if (!g_hCode) return;
-    LONG len = (LONG)GetWindowTextLengthW(g_hCode);
-    SendMessageW(g_hCode, EM_SETSEL, 0, len);
-
-    CHARFORMAT2W cf{};
-    cf.cbSize = sizeof(cf);
-    cf.dwMask = CFM_UNDERLINE | CFM_COLOR;
-    cf.dwEffects = 0;
-    cf.crTextColor = TOK_CODE_TEXT; // normal: siyah
-    SendMessageW(g_hCode, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM)&cf);
-
-    SendMessageW(g_hCode, EM_SETSEL, -1, -1);
+    Editor_HighlightSyntax();
 }
 
 static void Editor_ApplyMark(int line1, int col1) {
@@ -937,7 +1169,7 @@ static void Editor_ApplyMark(int line1, int col1) {
     cf.cbSize = sizeof(cf);
     cf.dwMask = CFM_UNDERLINE | CFM_COLOR;
     cf.dwEffects = CFE_UNDERLINE;
-    cf.crTextColor = RGB(255, 90, 90); // kırmızı
+    cf.crTextColor = RGB(255, 190, 60); // Kırmızı arka planda parlayan altın-sarı hata dalgası
     SendMessageW(g_hCode, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM)&cf);
 
     SendMessageW(g_hCode, EM_SETSEL, pos, pos);
@@ -947,7 +1179,6 @@ static void Editor_ApplyMark(int line1, int col1) {
     PostMessageW(g_hMain, WM_APP_UPDSTATUS, 0, 0);
 }
 
-// İstenen isimlerle küçük wrapper’lar
 static void Editor_ClearErrorMarks() { Editor_ClearAllMarks(); }
 static void Editor_MarkError(int line1, int col1) { Editor_ApplyMark(line1, col1); }
 
@@ -984,12 +1215,6 @@ static const wchar_t* BtnTip(int id) {
     }
 }
 
-static COLORREF BtnBaseColor(int id) {
-    if (id == IDC_BTN_RUN)  return TOK_GOOD;
-    if (id == IDC_BTN_MORE) return Mix(TOK_SURFACE2, 10);
-    return Mix(TOK_SURFACE2, 0);
-}
-
 // ===================== Tooltips =====================
 static void EnsureTooltips(HWND hwnd) {
     if (g_hTooltip) return;
@@ -1020,14 +1245,14 @@ static void EnsureTooltips(HWND hwnd) {
     addTip(GetDlgItem(hwnd, IDC_BTN_MORE), IDC_BTN_MORE);
 }
 
-// ===================== Owner-draw tabs =====================
+// ===================== Owner-draw tabs (MODERN FLAT TAB) =====================
 static void DrawTabModern(HWND tab, DRAWITEMSTRUCT* dis) {
     HDC dc = dis->hDC;
     RECT r = dis->rcItem;
     bool sel = (dis->itemState & ODS_SELECTED) != 0;
 
-    COLORREF bg = sel ? Mix(TOK_SURFACE2, 6) : TOK_SURFACE;
-    COLORREF tx = sel ? TOK_TEXT : TOK_MUTED;
+    COLORREF bg = sel ? TOK_BG : TOK_SURFACE;
+    COLORREF tx = sel ? TOK_CODE_TEXT : TOK_TEXT;
 
     HBRUSH br = CreateSolidBrush(bg);
     FillRect(dc, &r, br);
@@ -1041,6 +1266,13 @@ static void DrawTabModern(HWND tab, DRAWITEMSTRUCT* dis) {
         DeleteObject(brI);
     }
 
+    HPEN bPen = CreatePen(PS_SOLID, 1, TOK_BORDER);
+    HGDIOBJ oldP = SelectObject(dc, bPen);
+    MoveToEx(dc, r.left, r.top, nullptr);
+    LineTo(dc, r.right, r.top);
+    SelectObject(dc, oldP);
+    DeleteObject(bPen);
+
     wchar_t text[64] = L"";
     TCITEMW ti{};
     ti.mask = TCIF_TEXT;
@@ -1053,15 +1285,14 @@ static void DrawTabModern(HWND tab, DRAWITEMSTRUCT* dis) {
     HFONT oldF = (HFONT)SelectObject(dc, gFontUI);
 
     RECT tr = r;
-    tr.left += 14; tr.right -= 14;
-    DrawTextW(dc, text, -1, &tr, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+    tr.left += 6; tr.right -= 6;
+    DrawTextW(dc, text, -1, &tr, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
     SelectObject(dc, oldF);
 }
 
 // ===================== Command Palette =====================
 static void ShowCommandMenu(HWND hwnd) {
-    // Basit “komut paleti” = popup menu (şimdilik)
     HMENU m = CreatePopupMenu();
     AppendMenuW(m, MF_STRING, IDM_RUN_F5, L"Çalıştır (VM)\tF5");
     AppendMenuW(m, MF_STRING, IDM_RUN_INTERP, L"Çalıştır (Interpreter)\tCtrl+F5");
@@ -1084,10 +1315,9 @@ static void ShowCommandMenu(HWND hwnd) {
     POINT pt{};
     GetCursorPos(&pt);
 
-    // TrackPopupMenu geri dönüşte seçimi döndürür (TPM_RETURNCMD)
     UINT cmd = TrackPopupMenu(
         m,
-        TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD,
+        TPM_TOPALIGN | TPM_RETURNCMD,
         pt.x, pt.y,
         0, hwnd, nullptr
     );
@@ -1100,7 +1330,7 @@ static void ShowCommandMenu(HWND hwnd) {
 
 // ===================== Accelerators =====================
 static void BuildAccelerators() {
-    if (g_hAccel) { DestroyAcceleratorTable(g_hAccel); g_hAccel = nullptr; }
+    if (g_hAccel) { DeleteObject(g_hAccel); g_hAccel = nullptr; }
 
     std::vector<ACCEL> a;
     auto add = [&](BYTE fVirt, WORD key, WORD cmd) {
@@ -1123,8 +1353,6 @@ static void BuildAccelerators() {
 
     add(FVIRTKEY, VK_F5, IDM_RUN_F5);
     add(FCONTROL | FVIRTKEY, VK_F5, IDM_RUN_INTERP);
-
-    // (1) Ctrl+Shift+P => Komut Menüsü
     add(FCONTROL | FSHIFT | FVIRTKEY, 'P', IDM_TOOLS_COMMANDPALETTE);
 
     g_hAccel = CreateAcceleratorTableW(a.data(), (int)a.size());
@@ -1162,6 +1390,13 @@ static void BuildMenuBar(HWND hwnd) {
     AppendMenuW(hView, MF_STRING, IDM_VIEW_WRAP, L"Satır Kaydırma (Wrap)");
     AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR)hView, L"Görünüm");
 
+    HMENU hExamples = CreatePopupMenu();
+    AppendMenuW(hExamples, MF_STRING, IDM_EXAMPLE_1, L"1. Genel Ege Ağzı Turu (Varsayılan)");
+    AppendMenuW(hExamples, MF_STRING, IDM_EXAMPLE_2, L"2. Özyineleme (Fibonacci) ve Dizi İşlemleri");
+    AppendMenuW(hExamples, MF_STRING, IDM_EXAMPLE_3, L"3. Kalıp (Struct), Gez_gari ve Bak_hele (Switch)");
+    AppendMenuW(hExamples, MF_STRING, IDM_EXAMPLE_4, L"4. Hata Yakalama (Dene/Yakala) ve Metin İşlemleri");
+    AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR)hExamples, L"Örnekler");
+
     HMENU hTools = CreatePopupMenu();
     AppendMenuW(hTools, MF_STRING, IDM_TOOLS_COMMANDPALETTE, L"Komut Menüsü\tCtrl+Shift+P");
     AppendMenuW(hTools, MF_SEPARATOR, 0, nullptr);
@@ -1169,6 +1404,8 @@ static void BuildMenuBar(HWND hwnd) {
     AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR)hTools, L"Araçlar");
 
     HMENU hHelp = CreatePopupMenu();
+    AppendMenuW(hHelp, MF_STRING, IDM_HELP_LANGREF, L"Ege Ağzı Dil Sözlüğü (Kılavuz)");
+    AppendMenuW(hHelp, MF_SEPARATOR, 0, nullptr);
     AppendMenuW(hHelp, MF_STRING, IDM_HELP_ABOUT, L"Hakkında");
     AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR)hHelp, L"Yardım");
 
@@ -1181,7 +1418,7 @@ static void Layout(HWND hwnd) {
     int W = rc.right - rc.left;
     int H = rc.bottom - rc.top;
 
-    int pad = 10;
+    int pad = 6;
     int contentTop = gTopH + pad;
     int contentBottom = H - gStatusH - pad;
     int contentH = contentBottom - contentTop;
@@ -1211,20 +1448,20 @@ static void Layout(HWND hwnd) {
     int hSplitY = contentTop + mainAreaH + 0;
     gHSplitY = hSplitY;
 
-    int bx = pad, by = 10, bh = 32, gap = 8;
-    auto mvb = [&](int id, int w = 40) {
+    int bx = pad, by = 10, bh = 32, gap = 6;
+    auto mvb = [&](int id, int w = 36) {
         HWND b = GetDlgItem(hwnd, id);
         if (!b) return;
         MoveWindow(b, bx, by, w, bh, TRUE);
         bx += w + gap;
         };
 
-    mvb(IDC_BTN_RUN, 46);
-    mvb(IDC_BTN_OPEN, 40);
-    mvb(IDC_BTN_SAVE, 40);
-    mvb(IDC_BTN_CLR, 40);
+    mvb(IDC_BTN_RUN, 42);
+    mvb(IDC_BTN_OPEN, 38);
+    mvb(IDC_BTN_SAVE, 38);
+    mvb(IDC_BTN_CLR, 38);
 
-    int moreW = 44;
+    int moreW = 38;
     HWND bMore = GetDlgItem(hwnd, IDC_BTN_MORE);
     if (bMore) MoveWindow(bMore, W - pad - moreW, by, moreW, bh, TRUE);
 
@@ -1288,14 +1525,157 @@ static LRESULT CALLBACK ConsoleInProc(HWND h, UINT m, WPARAM w, LPARAM l) {
     return CallWindowProcW(gOldConsoleInProc, h, m, w, l);
 }
 
-// ===================== Editor subclass (Ctrl+Wheel zoom + status/gutter updates) =====================
+// ===================== Editor subclass (Ctrl+Wheel zoom + Auto-Indent + Auto-Complete + status/gutter) =====================
 static WNDPROC gOldCodeProc = nullptr;
+
+static const wchar_t* const kAutoCompleteWords[] = {
+    L"basla_gari", L"fonksiyon_gari", L"kalip_gari", L"dondur_gari", L"doktur",
+    L"sayet", L"yoksa", L"oldukca", L"bi_yap_hele", L"cevir_gari", L"gez_gari",
+    L"bak_hele", L"olursa", L"hicbiri", L"kir_gari", L"pas_gec",
+    L"dene_gari", L"yakala_gari", L"firlat_gari",
+    L"tamsayi", L"hassas_sayi", L"cift_hassas_sayi", L"laf", L"mantik", L"bos_gari", L"sabit",
+    L"dizi_gari", L"sozluk_gari", L"hakli", L"haksiz", L"hem_de", L"ya_da", L"degil_gari",
+    L"oku_gari", L"oku_tamsayi", L"oku_hassas_sayi",
+    L"boyut_gari", L"ekle_gari", L"cikar_gari", L"sirala_gari", L"ters_cevir_gari",
+    L"anahtarlar_gari", L"sil_gari", L"icinde_var_mi", L"rastgele_gari",
+    L"lafa_cevir", L"tamsayiya_cevir", L"hassasa_cevir",
+    L"buyut_gari", L"kucult_gari", L"kirp_gari", L"parcala_gari", L"degistir_gari",
+    L"dosya_yaz_gari", L"dosya_oku_gari", L"dosya_var_mi", L"bekle_gari", L"vakit_gari"
+};
+
+static std::wstring GetRichEditNormalizedText(HWND h) {
+    std::wstring raw = GetTextW(h);
+    std::wstring text;
+    text.reserve(raw.size());
+    for (size_t k = 0; k < raw.size(); ++k) {
+        if (raw[k] == L'\r' && k + 1 < raw.size() && raw[k + 1] == L'\n') {
+            text.push_back(L'\n');
+            k++;
+        } else {
+            text.push_back(raw[k]);
+        }
+    }
+    return text;
+}
+
+static void TriggerAutoComplete(HWND h) {
+    DWORD selStart = 0, selEnd = 0;
+    SendMessageW(h, EM_GETSEL, (WPARAM)&selStart, (LPARAM)&selEnd);
+    std::wstring text = GetRichEditNormalizedText(h);
+    if (selStart > text.size()) selStart = (DWORD)text.size();
+
+    int wordStart = (int)selStart;
+    while (wordStart > 0 && (std::iswalnum(text[(size_t)(wordStart - 1)]) || text[(size_t)(wordStart - 1)] == L'_')) {
+        wordStart--;
+    }
+    std::wstring prefix = text.substr((size_t)wordStart, (size_t)(selStart - wordStart));
+
+    std::vector<std::wstring> matches;
+    for (auto cand : kAutoCompleteWords) {
+        std::wstring c = cand;
+        if (prefix.empty() || (c.size() >= prefix.size() && c.compare(0, prefix.size(), prefix) == 0)) {
+            matches.push_back(c);
+        }
+    }
+    if (matches.empty()) return;
+
+    if (matches.size() == 1) {
+        SendMessageW(h, EM_SETSEL, wordStart, selStart);
+        SendMessageW(h, EM_REPLACESEL, TRUE, (LPARAM)matches[0].c_str());
+        return;
+    }
+
+    HMENU m = CreatePopupMenu();
+    for (size_t idx = 0; idx < matches.size(); ++idx) {
+        AppendMenuW(m, MF_STRING, 5000 + idx, matches[idx].c_str());
+    }
+    POINT pt{};
+    GetCaretPos(&pt);
+    ClientToScreen(h, &pt);
+    UINT chosen = TrackPopupMenu(m, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, pt.x, pt.y + 20, 0, h, nullptr);
+    DestroyMenu(m);
+
+    if (chosen >= 5000 && (chosen - 5000) < matches.size()) {
+        const std::wstring& rep = matches[chosen - 5000];
+        SendMessageW(h, EM_SETSEL, wordStart, selStart);
+        SendMessageW(h, EM_REPLACESEL, TRUE, (LPARAM)rep.c_str());
+    }
+}
+
 static LRESULT CALLBACK CodeEditProc(HWND h, UINT m, WPARAM w, LPARAM l) {
     if (m == WM_MOUSEWHEEL) {
         if (GetKeyState(VK_CONTROL) & 0x8000) {
             int delta = GET_WHEEL_DELTA_WPARAM(w);
             if (delta > 0) ZoomIn(); else ZoomOut();
             return 0;
+        }
+    }
+    if (m == WM_KEYDOWN) {
+        // Ctrl + Space: Satır içi otomatik tamamlama
+        if (w == VK_SPACE && (GetKeyState(VK_CONTROL) & 0x8000)) {
+            TriggerAutoComplete(h);
+            return 0;
+        }
+        // Tab tuşu: 4 boşluk ekle (veya kelime başındaysa ve Ctrl basılı değilse 4 boşluk)
+        if (w == VK_TAB) {
+            SendMessageW(h, EM_REPLACESEL, TRUE, (LPARAM)L"    ");
+            return 0;
+        }
+        // Enter tuşu: Otomatik girintileme (Auto-Indent)
+        if (w == VK_RETURN) {
+            DWORD selStart = 0, selEnd = 0;
+            SendMessageW(h, EM_GETSEL, (WPARAM)&selStart, (LPARAM)&selEnd);
+            std::wstring text = GetRichEditNormalizedText(h);
+            if (selStart > text.size()) selStart = (DWORD)text.size();
+
+            int lineStart = (int)selStart;
+            while (lineStart > 0 && text[(size_t)(lineStart - 1)] != L'\n') lineStart--;
+
+            std::wstring indent;
+            int p = lineStart;
+            while (p < (int)selStart && (text[(size_t)p] == L' ' || text[(size_t)p] == L'\t')) {
+                indent.push_back(text[(size_t)p]);
+                p++;
+            }
+
+            // Satırın son anlamlı karakteri '{' veya ':' ise 4 boşluk ekstra girinti ekle
+            int lastNonWS = (int)selStart - 1;
+            while (lastNonWS >= lineStart && (text[(size_t)lastNonWS] == L' ' || text[(size_t)lastNonWS] == L'\t')) {
+                lastNonWS--;
+            }
+            if (lastNonWS >= lineStart && (text[(size_t)lastNonWS] == L'{' || text[(size_t)lastNonWS] == L':')) {
+                indent += L"    ";
+            }
+
+            std::wstring ins = L"\r\n" + indent;
+            SendMessageW(h, EM_REPLACESEL, TRUE, (LPARAM)ins.c_str());
+            if (g_hGutter) InvalidateRect(g_hGutter, nullptr, TRUE);
+            PostMessageW(g_hMain, WM_APP_UPDSTATUS, 0, 0);
+            return 0;
+        }
+    }
+    if (m == WM_CHAR) {
+        if (w == L' ' && (GetKeyState(VK_CONTROL) & 0x8000)) {
+            return 0; // Ctrl+Space karakter basmasını engelle
+        }
+        // '}' yazıldığında satır sadece boşluklardan oluşuyorsa otomatik 4 boşluk geri çek
+        if (w == L'}') {
+            DWORD selStart = 0, selEnd = 0;
+            SendMessageW(h, EM_GETSEL, (WPARAM)&selStart, (LPARAM)&selEnd);
+            std::wstring text = GetRichEditNormalizedText(h);
+            if (selStart == selEnd && selStart <= text.size()) {
+                int lineStart = (int)selStart;
+                while (lineStart > 0 && text[(size_t)(lineStart - 1)] != L'\n') lineStart--;
+                bool allSpaces = true;
+                for (int k = lineStart; k < (int)selStart; ++k) {
+                    if (text[(size_t)k] != L' ') { allSpaces = false; break; }
+                }
+                if (allSpaces && ((int)selStart - lineStart) >= 4) {
+                    SendMessageW(h, EM_SETSEL, selStart - 4, selStart);
+                    SendMessageW(h, EM_REPLACESEL, TRUE, (LPARAM)L"}");
+                    return 0;
+                }
+            }
         }
     }
     if (m == WM_VSCROLL || m == WM_HSCROLL || m == WM_KEYUP || m == WM_LBUTTONUP || m == WM_CHAR) {
@@ -1313,12 +1693,10 @@ static void ShowOverflowMenu(HWND hwnd, int xScreen, int yScreen) {
     AppendMenuW(m, MF_STRING, IDM_TOOLS_COMMANDPALETTE, L"Komut Menüsü\tCtrl+Shift+P");
     AppendMenuW(m, MF_STRING, IDM_EDIT_FIND, L"Bul...\tCtrl+F");
     AppendMenuW(m, MF_SEPARATOR, 0, nullptr);
-
     AppendMenuW(m, MF_STRING, IDM_VIEW_SHOW_TOKEN, L"Token Göster (Sağ)");
     AppendMenuW(m, MF_STRING, IDM_VIEW_SHOW_AST, L"AST Göster (Sağ)");
     AppendMenuW(m, MF_STRING, IDM_VIEW_SHOW_IR, L"IR Göster (Sağ)");
     AppendMenuW(m, MF_SEPARATOR, 0, nullptr);
-
     AppendMenuW(m, MF_STRING, IDM_VIEW_WRAP, gWrapOn ? L"Wrap Kapat" : L"Wrap Aç");
     AppendMenuW(m, MF_STRING, IDM_VIEW_ZOOMIN, L"Zoom +");
     AppendMenuW(m, MF_STRING, IDM_VIEW_ZOOMOUT, L"Zoom -");
@@ -1341,23 +1719,36 @@ static void PaintBackground(HWND hwnd) {
     RECT bg{ rc.left, rc.top + gTopH, rc.right, rc.bottom };
     FillRect(dc, &bg, gBrBg);
 
+    HPEN sPen = CreatePen(PS_SOLID, 1, TOK_BORDER);
+    HGDIOBJ oldP = SelectObject(dc, sPen);
+
     if (gVSplitX >= 0) {
-        RECT sp{ gVSplitX, gTopH + 10, gVSplitX + gSplitterW, rc.bottom - gStatusH - 10 };
-        HBRUSH br = CreateSolidBrush(Mix(TOK_SURFACE2, -4));
-        FillRect(dc, &sp, br);
-        DeleteObject(br);
+        RECT sp{ gVSplitX, gTopH, gVSplitX + gSplitterW, rc.bottom - gStatusH };
+        FillRect(dc, &sp, gBrBg);
+        MoveToEx(dc, gVSplitX, gTopH, nullptr);
+        LineTo(dc, gVSplitX, rc.bottom - gStatusH);
+        MoveToEx(dc, gVSplitX + gSplitterW - 1, gTopH, nullptr);
+        LineTo(dc, gVSplitX + gSplitterW - 1, rc.bottom - gStatusH);
     }
     if (gHSplitY >= 0) {
-        RECT sp{ 10, gHSplitY, rc.right - 10, gHSplitY + gSplitterW };
-        HBRUSH br = CreateSolidBrush(Mix(TOK_SURFACE2, -6));
-        FillRect(dc, &sp, br);
-        DeleteObject(br);
+        RECT sp{ 0, gHSplitY, rc.right, gHSplitY + gSplitterW };
+        FillRect(dc, &sp, gBrBg);
+        MoveToEx(dc, 0, gHSplitY, nullptr);
+        LineTo(dc, rc.right, gHSplitY);
+        MoveToEx(dc, 0, gHSplitY + gSplitterW - 1, nullptr);
+        LineTo(dc, rc.right, gHSplitY + gSplitterW - 1);
     }
+
+    MoveToEx(dc, rc.left, gTopH - 1, nullptr);
+    LineTo(dc, rc.right, gTopH - 1);
+
+    SelectObject(dc, oldP);
+    DeleteObject(sPen);
 
     EndPaint(hwnd, &ps);
 }
 
-// ===================== Button owner-draw (main toolbar) =====================
+// ===================== Button owner-draw (MODERN SOFT PASTEL) =====================
 static LRESULT DrawButton(DRAWITEMSTRUCT* dis) {
     int id = (int)dis->CtlID;
     HDC dc = dis->hDC;
@@ -1367,37 +1758,45 @@ static LRESULT DrawButton(DRAWITEMSTRUCT* dis) {
     bool hot = (dis->itemState & ODS_HOTLIGHT) != 0;
     bool disb = (dis->itemState & ODS_DISABLED) != 0;
 
-    COLORREF base = BtnBaseColor(id);
-    if (disb) base = Mix(base, -30);
+    COLORREF bgClr = TOK_SURFACE;
+    COLORREF glyphClr = TOK_TEXT;
 
-    HBRUSH br = CreateSolidBrush(down ? Mix(base, -18) : (hot ? Mix(base, 10) : base));
+    if (disb) {
+        glyphClr = TOK_MUTED;
+    }
+    else if (down) {
+        bgClr = TOK_SURFACE2;
+        if (id == IDC_BTN_RUN) glyphClr = TOK_GOOD;
+    }
+    else if (hot) {
+        bgClr = TOK_SURFACE2;
+        if (id == IDC_BTN_RUN) glyphClr = TOK_GOOD;
+        else glyphClr = RGB(255, 255, 255);
+    }
+    else {
+        if (id == IDC_BTN_RUN) glyphClr = TOK_GOOD;
+    }
+
+    HBRUSH br = CreateSolidBrush(bgClr);
     FillRect(dc, &r, br);
     DeleteObject(br);
 
-    if (id == IDC_BTN_RUN && !disb) {
-        RECT hi = r;
-        hi.bottom = hi.top + 3;
-        HBRUSH brHi = CreateSolidBrush(Mix(TOK_GOOD, 35));
-        FillRect(dc, &hi, brHi);
-        DeleteObject(brHi);
+    if (hot && !disb) {
+        HPEN bPen = CreatePen(PS_SOLID, 1, TOK_BORDER);
+        HGDIOBJ oldP = SelectObject(dc, bPen);
+        HGDIOBJ oldB = SelectObject(dc, GetStockObject(HOLLOW_BRUSH));
+        RoundRect(dc, r.left, r.top, r.right, r.bottom, 4, 4);
+        SelectObject(dc, oldB);
+        SelectObject(dc, oldP);
+        DeleteObject(bPen);
     }
 
-    HPEN pen = CreatePen(PS_SOLID, 1, Mix(TOK_BORDER, -10));
-    HGDIOBJ oldP = SelectObject(dc, pen);
-    HGDIOBJ oldB = SelectObject(dc, GetStockObject(HOLLOW_BRUSH));
-    RoundRect(dc, r.left, r.top, r.right, r.bottom, 8, 8);
-    SelectObject(dc, oldB);
-    SelectObject(dc, oldP);
-    DeleteObject(pen);
-
     SetBkMode(dc, TRANSPARENT);
-    SetTextColor(dc, RGB(255, 255, 255));
+    SetTextColor(dc, glyphClr);
     HFONT oldF = (HFONT)SelectObject(dc, gFontUI);
 
     std::wstring g = BtnGlyph(id);
-    RECT rr = r;
-    if (id == IDC_BTN_RUN) rr.top -= 1;
-    DrawTextW(dc, g.c_str(), -1, &rr, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+    DrawTextW(dc, g.c_str(), -1, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
     SelectObject(dc, oldF);
     return TRUE;
@@ -1410,12 +1809,12 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
         g_hMain = hwnd;
         LoadLibraryW(L"Msftedit.dll");
 
-        if (!gBrBg)       gBrBg = CreateSolidBrush(TOK_BG);
-        if (!gBrSurface)  gBrSurface = CreateSolidBrush(TOK_SURFACE);
-        if (!gBrSurface2) gBrSurface2 = CreateSolidBrush(TOK_SURFACE2);
-        if (!gBrTab)      gBrTab = CreateSolidBrush(TOK_SURFACE);
-        if (!gBrEdit)     gBrEdit = CreateSolidBrush(TOK_BG);
-        if (!gBrEditorWhite) gBrEditorWhite = CreateSolidBrush(TOK_EDITOR_BG);
+        if (!gBrBg)           gBrBg = CreateSolidBrush(TOK_BG);
+        if (!gBrSurface)      gBrSurface = CreateSolidBrush(TOK_SURFACE);
+        if (!gBrSurface2)     gBrSurface2 = CreateSolidBrush(TOK_SURFACE2);
+        if (!gBrTab)          gBrTab = CreateSolidBrush(TOK_SURFACE);
+        if (!gBrEdit)         gBrEdit = CreateSolidBrush(TOK_BG);
+        if (!gBrEditorWhite)  gBrEditorWhite = CreateSolidBrush(TOK_EDITOR_BG);
 
         RecreateFontsWithSize(gUIFontPx, gCodeFontPx);
 
@@ -1450,7 +1849,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
             0, 0, 10, 10, hwnd, (HMENU)(INT_PTR)IDC_GUTTER, GetModuleHandleW(nullptr), nullptr);
         ApplyFont(g_hGutter, gFontCode);
 
-        g_hCode = CreateWindowExW(WS_EX_CLIENTEDGE, MSFTEDIT_CLASS, L"",
+        g_hCode = CreateWindowExW(0, MSFTEDIT_CLASS, L"",
             WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | WS_VSCROLL | WS_HSCROLL,
             0, 0, 10, 10, hwnd, (HMENU)(INT_PTR)IDC_EDIT_CODE, GetModuleHandleW(nullptr), nullptr);
         ApplyFont(g_hCode, gFontCode);
@@ -1486,7 +1885,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
         auto mkview = [&](int id, bool readonly = true) {
             DWORD style = WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL;
             if (readonly) style |= ES_READONLY;
-            HWND e = CreateWindowExW(WS_EX_CLIENTEDGE, L"EDIT", L"",
+            HWND e = CreateWindowExW(0, L"EDIT", L"",
                 style, 0, 0, 10, 10, hwnd, (HMENU)(INT_PTR)id, GetModuleHandleW(nullptr), nullptr);
             ApplyFont(e, gFontCode);
             return e;
@@ -1504,12 +1903,8 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 
         ti.pszText = (LPWSTR)L"Console"; TabCtrl_InsertItem(g_hTabBottom, 0, &ti);
 
-        g_hConsoleOut = CreateWindowExW(WS_EX_CLIENTEDGE, L"EDIT", L"",
-            WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_READONLY,
-            0, 0, 10, 10, hwnd, (HMENU)(INT_PTR)IDC_CONSOLE_OUT, GetModuleHandleW(nullptr), nullptr);
-        ApplyFont(g_hConsoleOut, gFontCode);
-
-        g_hConsoleIn = CreateWindowExW(WS_EX_CLIENTEDGE, L"EDIT", L"",
+        g_hConsoleOut = mkview(IDC_CONSOLE_OUT, true);
+        g_hConsoleIn = CreateWindowExW(0, L"EDIT", L"",
             WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL,
             0, 0, 10, 10, hwnd, (HMENU)(INT_PTR)IDC_CONSOLE_IN, GetModuleHandleW(nullptr), nullptr);
         ApplyFont(g_hConsoleIn, gFontCode);
@@ -1523,10 +1918,11 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
         SetStatusTextLeft(L"Hazır");
 
         SetTextW(g_hCode, DemoCode());
+        Editor_HighlightSyntax();
         ApplyWrapState();
 
-        SendMessageW(g_hTabRight, TCM_SETITEMSIZE, 0, MAKELPARAM(120, 28));
-        SendMessageW(g_hTabBottom, TCM_SETITEMSIZE, 0, MAKELPARAM(120, 28));
+        SendMessageW(g_hTabRight, TCM_SETITEMSIZE, 0, MAKELPARAM(100, 26));
+        SendMessageW(g_hTabBottom, TCM_SETITEMSIZE, 0, MAKELPARAM(100, 26));
 
         TabCtrl_SetCurSel(g_hTabRight, 0);
         TabCtrl_SetCurSel(g_hTabBottom, 0);
@@ -1547,7 +1943,8 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
     case WM_MEASUREITEM: {
         MEASUREITEMSTRUCT* mi = (MEASUREITEMSTRUCT*)lParam;
         if (mi && mi->CtlType == ODT_TAB) {
-            mi->itemHeight = 28;
+            mi->itemHeight = 26;
+            mi->itemWidth = 90;
             return TRUE;
         }
         break;
@@ -1557,11 +1954,11 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
         if (LOWORD(lParam) == HTCLIENT) {
             POINT pt; GetCursorPos(&pt); ScreenToClient(hwnd, &pt);
 
-            if (gVSplitX >= 0 && pt.x >= gVSplitX - 2 && pt.x <= gVSplitX + gSplitterW + 2) {
+            if (gVSplitX >= 0 && pt.x >= gVSplitX - 1 && pt.x <= gVSplitX + gSplitterW + 1) {
                 SetCursor(LoadCursor(nullptr, IDC_SIZEWE));
                 return TRUE;
             }
-            if (gHSplitY >= 0 && pt.y >= gHSplitY - 2 && pt.y <= gHSplitY + gSplitterW + 2) {
+            if (gHSplitY >= 0 && pt.y >= gHSplitY - 1 && pt.y <= gHSplitY + gSplitterW + 1) {
                 SetCursor(LoadCursor(nullptr, IDC_SIZENS));
                 return TRUE;
             }
@@ -1571,12 +1968,12 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 
     case WM_LBUTTONDOWN: {
         POINT pt{ GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
-        if (gVSplitX >= 0 && pt.x >= gVSplitX - 2 && pt.x <= gVSplitX + gSplitterW + 2) {
+        if (gVSplitX >= 0 && pt.x >= gVSplitX - 1 && pt.x <= gVSplitX + gSplitterW + 1) {
             gDraggingVSplit = true;
             SetCapture(hwnd);
             return 0;
         }
-        if (gHSplitY >= 0 && pt.y >= gHSplitY - 2 && pt.y <= gHSplitY + gSplitterW + 2) {
+        if (gHSplitY >= 0 && pt.y >= gHSplitY - 1 && pt.y <= gHSplitY + gSplitterW + 1) {
             gDraggingHSplit = true;
             SetCapture(hwnd);
             return 0;
@@ -1588,7 +1985,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
         if (gDraggingVSplit) {
             RECT rc{}; GetClientRect(hwnd, &rc);
             int W = rc.right - rc.left;
-            int pad = 10;
+            int pad = 6;
 
             int x = GET_X_LPARAM(lParam);
             int rightX = x + gSplitterW;
@@ -1601,7 +1998,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
         if (gDraggingHSplit) {
             RECT rc{}; GetClientRect(hwnd, &rc);
             int H = rc.bottom - rc.top;
-            int pad = 10;
+            int pad = 6;
 
             int y = GET_Y_LPARAM(lParam);
             int contentBottom = H - gStatusH - pad;
@@ -1633,6 +2030,12 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 
         SetBkMode(hdc, OPAQUE);
 
+        if (hctl == g_hStatus) {
+            SetBkColor(hdc, TOK_SURFACE);
+            SetTextColor(hdc, TOK_TEXT);
+            return (LRESULT)gBrSurface;
+        }
+
         if (hctl == g_hCode) {
             SetBkColor(hdc, TOK_EDITOR_BG);
             SetTextColor(hdc, TOK_CODE_TEXT);
@@ -1642,7 +2045,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
         if (hctl == g_hTok || hctl == g_hAst || hctl == g_hIr ||
             hctl == g_hConsoleOut || hctl == g_hConsoleIn) {
             SetBkColor(hdc, TOK_BG);
-            SetTextColor(hdc, TOK_TEXT);
+            SetTextColor(hdc, TOK_CODE_TEXT);
             return (LRESULT)gBrEdit;
         }
 
@@ -1697,7 +2100,6 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
         UpdateStatusParts();
         return 0;
 
-        // (D) UI thread: hata işareti geldi
     case WM_APP_SETERRMARK: {
         auto* em = (ErrMark*)lParam;
         Editor_ClearErrorMarks();
@@ -1712,10 +2114,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
     case WM_APP_RUNFINISH:
         gRunActive = false;
         EnableRunUI(hwnd, true);
-
-        // (F) RUN OK öncesi garanti temiz (istersen kalsın)
         Editor_ClearErrorMarks();
-
         SetStatusTextLeft(L"RUN OK");
         PostMessageW(hwnd, WM_APP_UPDSTATUS, 0, 0);
         return 0;
@@ -1726,6 +2125,12 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
         HWND from = (HWND)lParam;
 
         if (from == g_hCode && code == EN_SELCHANGE) {
+            if (g_hGutter) InvalidateRect(g_hGutter, nullptr, TRUE);
+            PostMessageW(hwnd, WM_APP_UPDSTATUS, 0, 0);
+            return 0;
+        }
+        if (from == g_hCode && code == EN_CHANGE) {
+            Editor_HighlightSyntax();
             if (g_hGutter) InvalidateRect(g_hGutter, nullptr, TRUE);
             PostMessageW(hwnd, WM_APP_UPDSTATUS, 0, 0);
             return 0;
@@ -1821,7 +2226,6 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
         case IDM_VIEW_SHOW_AST:   DoBuildInspector(); FocusRight(1); return 0;
         case IDM_VIEW_SHOW_IR:    DoBuildInspector(); FocusRight(2); return 0;
 
-            // (1B) WM_COMMAND: Komut menüsü handler
         case IDM_TOOLS_COMMANDPALETTE:
             ShowCommandMenu(hwnd);
             return 0;
@@ -1831,17 +2235,65 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 L"Ayarlar (final UI):\n"
                 L"- Bottom: Console only\n"
                 L"- Right: Token/AST/IR\n"
-                L"- Find: modern dark popup\n"
-                L"- Editor: beyaz zemin + siyah yazı\n"
-                L"- Hata: kırmızı underline (RUN sonrası ilk hata)\n",
+                L"- Find: modern slate popup\n"
+                L"- Editor: Dark Carbon & Crimson theme\n"
+                L"- Hata: parlak altın-sarı underline (RUN sonrası ilk hata)\n",
                 L"Ayarlar",
+                MB_OK | MB_ICONINFORMATION);
+            return 0;
+
+        case IDM_EXAMPLE_1:
+            if (!gRunActive) { SetTextW(g_hCode, DemoCode()); Editor_ClearErrorMarks(); SetStatusTextLeft(L"Örnek 1 Yüklendi"); }
+            return 0;
+        case IDM_EXAMPLE_2:
+            if (!gRunActive) { SetTextW(g_hCode, ExampleCode_Algorithms()); Editor_ClearErrorMarks(); SetStatusTextLeft(L"Örnek 2 Yüklendi"); }
+            return 0;
+        case IDM_EXAMPLE_3:
+            if (!gRunActive) { SetTextW(g_hCode, ExampleCode_StructsAndSwitch()); Editor_ClearErrorMarks(); SetStatusTextLeft(L"Örnek 3 Yüklendi"); }
+            return 0;
+        case IDM_EXAMPLE_4:
+            if (!gRunActive) { SetTextW(g_hCode, ExampleCode_TryCatchAndFiles()); Editor_ClearErrorMarks(); SetStatusTextLeft(L"Örnek 4 Yüklendi"); }
+            return 0;
+
+        case IDM_HELP_LANGREF:
+            MessageBoxW(hwnd,
+                L"=== GariIDE: Ege Ağzı Programlama Dili Sözlüğü ===\n\n"
+                L"• basla_gari() { ... } : Ana program başlangıcı (main)\n"
+                L"• fonksiyon_gari <tip> <ad>(...) : Fonksiyon tanımlama\n"
+                L"• kalip_gari <Ad> { ... } : Yapı / Nesne kalıbı (struct)\n"
+                L"• dondur_gari <ifade>; : Değer döndürme (return)\n"
+                L"• doktur(<ifade>); : Konsola yazdırma (print)\n\n"
+                L"--- Veri Tipleri ---\n"
+                L"• tamsayi (int), hassas_sayi (float), cift_hassas_sayi (double)\n"
+                L"• laf (string), mantik (bool: hakli / haksiz), bos_gari (void)\n"
+                L"• sabit : Değiştirilemez sabit (const)\n"
+                L"• dizi_gari <tip> d = [1, 2, 3]; : Dinamik / sabit dizi\n\n"
+                L"--- Koşul ve Döngüler ---\n"
+                L"• sayet (...) { ... } yoksa { ... } : if / else\n"
+                L"• bak_hele (x) { olursa 1: ... kir_gari; hicbiri: ... } : switch / case\n"
+                L"• oldukca (...) { ... } : while döngüsü\n"
+                L"• bi_yap_hele { ... } oldukca (...); : do-while döngüsü\n"
+                L"• cevir_gari (tamsayi i=0; i<10; i++) { ... } : for döngüsü\n"
+                L"• gez_gari (<tip> x : dizi_veya_laf) { ... } : foreach döngüsü\n"
+                L"• kir_gari; (break) / pas_gec; (continue)\n"
+                L"• hem_de (&&), ya_da (||), degil_gari (!)\n\n"
+                L"--- Hata Yakalama ---\n"
+                L"• dene_gari { ... } yakala_gari (laf hata) { ... } : try / catch\n"
+                L"• firlat_gari(\"hata mesaji\"); : throw\n\n"
+                L"--- Yerleşik Fonksiyonlar ---\n"
+                L"• Girdi: oku_gari(), oku_tamsayi(), oku_hassas_sayi()\n"
+                L"• Dizi/Laf: boyut_gari(x), ekle_gari(d, x), cikar_gari(d), sirala_gari(d), ters_cevir_gari(x), icinde_var_mi(x, aranan)\n"
+                L"• Laf: buyut_gari(s), kucult_gari(s), kirp_gari(s), parcala_gari(s, bas, uz), degistir_gari(s, eski, yeni)\n"
+                L"• Dönüşüm: lafa_cevir(x), tamsayiya_cevir(x), hassasa_cevir(x)\n"
+                L"• Dosya/Sistem: dosya_yaz_gari(yol, s), dosya_oku_gari(yol), dosya_var_mi(yol), rastgele_gari(min, max), bekle_gari(ms), vakit_gari()",
+                L"Ege Ağzı Dil Sözlüğü",
                 MB_OK | MB_ICONINFORMATION);
             return 0;
 
         case IDM_HELP_ABOUT:
             MessageBoxW(hwnd,
-                L"GariIDE (UI Final)\n"
-                L"- Modern Win32 UI + Core motor\n"
+                L"GariIDE (UI Carbon Slate Edition)\n"
+                L"- Slate & Solid Crimson VS UI + Core motor\n"
                 L"- Command Menu: Ctrl+Shift+P\n"
                 L"Bay Stark build ✅",
                 L"Hakkında",
@@ -1875,7 +2327,6 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 return 0;
             }
 
-            // (E) RUN'a basınca önce eski kırmızıları temizle
             Editor_ClearErrorMarks();
 
             {
@@ -1901,7 +2352,6 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
                 std::wstring out = useVM ? RunCode_VM(src) : RunCode_Interpreter(src);
                 UI_AppendOutAsync(out);
 
-                // (C) ParseProblemsFromText(out) + ilk hatayı UI thread'e yolla
                 auto probs = ParseProblemsFromText(out);
                 if (!probs.empty()) {
                     auto* em = new ErrMark();
@@ -1933,8 +2383,63 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
     return DefWindowProcW(hwnd, msg, wParam, lParam);
 }
 
+static bool SaveWindowPng(HWND hwnd, const std::wstring& path) {
+    RECT rc{};
+    GetWindowRect(hwnd, &rc);
+    int w = rc.right - rc.left;
+    int h = rc.bottom - rc.top;
+    if (w <= 0 || h <= 0) return false;
+
+    HDC hdcScreen = GetDC(nullptr);
+    HDC hdcMem = CreateCompatibleDC(hdcScreen);
+    BITMAPINFO bmi{};
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth = w;
+    bmi.bmiHeader.biHeight = -h; // top-down
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biCompression = BI_RGB;
+
+    void* bits = nullptr;
+    HBITMAP hbm = CreateDIBSection(hdcScreen, &bmi, DIB_RGB_COLORS, &bits, nullptr, 0);
+    if (!hbm) {
+        DeleteDC(hdcMem);
+        ReleaseDC(nullptr, hdcScreen);
+        return false;
+    }
+    HGDIOBJ oldBm = SelectObject(hdcMem, hbm);
+
+    // PW_RENDERFULLCONTENT = 2 veya 0 ile pencereyi ve alt kontrollerini çiz
+    if (!PrintWindow(hwnd, hdcMem, 2)) {
+        PrintWindow(hwnd, hdcMem, 0);
+    }
+
+    // 32-bit BMP olarak kaydet
+    BITMAPFILEHEADER bfh{};
+    DWORD imgSize = (DWORD)(w * h * 4);
+    bfh.bfType = 0x4D42; // 'BM'
+    bfh.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+    bfh.bfSize = bfh.bfOffBits + imgSize;
+
+    // Bottom-up BMP veya pozitif yükseklik yerine BMP okuyucuların tam uyumu için:
+    HANDLE hf = CreateFileW(path.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (hf != INVALID_HANDLE_VALUE) {
+        DWORD wr = 0;
+        WriteFile(hf, &bfh, sizeof(bfh), &wr, nullptr);
+        WriteFile(hf, &bmi.bmiHeader, sizeof(BITMAPINFOHEADER), &wr, nullptr);
+        WriteFile(hf, bits, imgSize, &wr, nullptr);
+        CloseHandle(hf);
+    }
+
+    SelectObject(hdcMem, oldBm);
+    DeleteObject(hbm);
+    DeleteDC(hdcMem);
+    ReleaseDC(nullptr, hdcScreen);
+    return true;
+}
+
 // ===================== WinMain =====================
-int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, PWSTR, int nCmdShow) {
+int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, PWSTR lpCmdLine, int nCmdShow) {
     WNDCLASSW wc{};
     wc.hInstance = hInst;
     wc.lpszClassName = L"GariIDE_Main";
@@ -1945,11 +2450,51 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, PWSTR, int nCmdShow) {
 
     HWND hwnd = CreateWindowExW(0, wc.lpszClassName, L"GariIDE",
         WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, 1280, 860,
+        40, 40, 1280, 820,
         nullptr, nullptr, hInst, nullptr);
 
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
+
+    // Eğer "--capture <klasor>" argümanı ile başlatıldıysa 4 örneği de çalıştırıp ekran görüntülerini kaydet ve çık
+    std::wstring cmd = lpCmdLine ? lpCmdLine : L"";
+    if (cmd.find(L"--capture") != std::wstring::npos) {
+        std::wstring outDir = L"C:\\Users\\ykoc0\\.gemini\\antigravity\\brain\\7e9542a8-b638-4ac8-bb3a-4f4852db8eb3";
+        auto pump = [&](int ms) {
+            DWORD t0 = GetTickCount();
+            MSG m{};
+            while (GetTickCount() - t0 < (DWORD)ms) {
+                while (PeekMessageW(&m, nullptr, 0, 0, PM_REMOVE)) {
+                    TranslateMessage(&m);
+                    DispatchMessageW(&m);
+                }
+                Sleep(15);
+            }
+        };
+        auto runSyncForShot = [&](int exCmd, int rightTabCmd, const wchar_t* fileName) {
+            SendMessageW(hwnd, WM_COMMAND, exCmd, 0);
+            pump(150);
+            SendMessageW(hwnd, WM_COMMAND, rightTabCmd, 0);
+            pump(150);
+            std::wstring src = GetTextW(g_hCode);
+            std::wstring out = L"[RUN] Başladı. (Bytecode VM Modu - F5)\r\n" + RunCode_VM(src);
+            SetTextW(g_hConsoleOut, out);
+            SetStatusTextLeft(L"RUN OK");
+            UpdateStatusParts();
+            Layout(hwnd);
+            pump(250);
+            RedrawWindow(hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_UPDATENOW | RDW_ALLCHILDREN);
+            pump(250);
+            SaveWindowPng(hwnd, outDir + L"\\" + fileName);
+        };
+
+        pump(400);
+        runSyncForShot(IDM_EXAMPLE_1, IDM_VIEW_SHOW_TOKEN, L"shot1.bmp");
+        runSyncForShot(IDM_EXAMPLE_2, IDM_VIEW_SHOW_AST,   L"shot2.bmp");
+        runSyncForShot(IDM_EXAMPLE_3, IDM_VIEW_SHOW_IR,    L"shot3.bmp");
+        runSyncForShot(IDM_EXAMPLE_4, IDM_VIEW_SHOW_AST,   L"shot4.bmp");
+        return 0;
+    }
 
     MSG msg{};
     while (GetMessageW(&msg, nullptr, 0, 0)) {
